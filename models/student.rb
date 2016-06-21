@@ -118,3 +118,4 @@ class Student < Database::Model
     Database::Model.execute(update_sql, *values, self.old_attributes[:id])
   end
 end
+

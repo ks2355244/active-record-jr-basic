@@ -33,10 +33,91 @@ module Database
       @attribute_names
     end
 
+    self.attribute_names =  [:id, :name, :created_at, :updated_at]
+
+  attr_reader :attributes, :old_attributes
+
+  def initialize(attributes = {})
+    attributes.symbolize_keys!
+    raise_error_if_invalid_attribute!(attributes.keys)
+
+    @attributes = {}
+
+    Cohort.attribute_names.each do |name|
+      @attributes[name] = attributes[name]
+    end
+
+    def [](attribute)
+    raise_error_if_invalid_attribute!(attribute)
+
+    @attributes[attribute]
+  end
+
+  def []=(attribute, value)
+    raise_error_if_invalid_attribute!(attribute)
+
+    @attributes[attribute] = value
+  end
+
+    def save
+    if new_record?
+      results = insert!
+    else
+      results = update!
+    end
+
+    @old_attributes = @attributes.dup
+
+    results
+  end
+
     def self.attribute_names=(attribute_names)
       @attribute_names = attribute_names
     end
 
+  self.attribute_names =  [:id, :cohort_id, :first_name, :last_name, :email,
+                           :gender, :birthdate, :created_at, :updated_at] 
+
+  attr_reader :attributes, :old_attributes
+
+  def initialize(attributes = {})
+    attributes.symbolize_keys!
+
+    raise_error_if_invalid_attribute!(attributes.keys)
+
+    # This defines the value even if it's not present in attributes
+    @attributes = {}
+
+    Student.attribute_names.each do |name|
+      @attributes[name] = attributes[name]
+    end
+
+    @old_attributes = @attributes.dup
+  end
+
+  def save
+    if new_record?
+      results = insert!
+    else
+      results = update!
+    end
+
+    @old_attributes = @attributes.dup
+
+    results
+  end
+
+  def [](attribute)
+    raise_error_if_invalid_attribute!(attribute)
+
+    @attributes[attribute]
+  end
+
+  def []=(attribute, value)
+    raise_error_if_invalid_attribute!(attribute)
+
+    @attributes[attribute] = value
+  end
     # Input looks like, e.g.,
     # execute("SELECT * FROM students WHERE id = ?", 1)
     # Returns an Array of Hashes (key/value pairs)
